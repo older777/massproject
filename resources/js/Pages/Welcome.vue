@@ -32,6 +32,7 @@ const orderForm = useForm({
     message: '',
 });
 const submitOrder = () => {
+    orderForm.clearErrors();
     const res = axios.post(route('submit.order'), orderForm)
         .then((res) => { showSuccess(res.data.messageSuccess); })
         .catch(function (error) {
@@ -43,17 +44,29 @@ const submitOrder = () => {
 
 const showSuccess = (message) => {
     messageSuccess.value = message;
+    if (message) {
+        orderForm.reset();
+    }
 };
 const showError = (message) => {
     if (typeof message.messageError !== 'undefined') {
         messageError.value = message.messageError;
     } else {
-        messageError.value = message;
+        messageError.value = message.message;
+        if (message.errors.name) {
+            orderForm.setError('name', message.errors.name[0]);
+        };
+        if (message.errors.email) {
+            orderForm.setError('email', message.errors.email[0]);
+        };
+        if (message.errors.message) {
+            orderForm.setError('message', message.errors.message[0]);
+        };
     }
 };
 
 const onAfterMessage = () => {
-    setTimeout(() => {messageSuccess.value = ''; messageError.value = '';}, '2000');
+    setTimeout(() => {messageSuccess.value = ''; messageError.value = '';}, '3000');
 };
 
 onBeforeUnmount(() => {
@@ -110,18 +123,21 @@ onBeforeMount(() => {
                     <form @submit.prevent="submitOrder">
                         <InputLabel for="name" value="Имя" />
                         <TextInput type="text" name="name" v-model="orderForm.name" />
+                        <div v-if="orderForm.errors.name" class="text-red-500">{{ orderForm.errors.name }}</div>
                         <InputLabel for="email" value="Email" />
-                        <TextInput type="text" name="email" v-model="orderForm.email" />
-                         <InputLabel for="message" value="Введите сообщение" />
+                        <TextInput type="email" name="email" v-model="orderForm.email" required />
+                        <div v-if="orderForm.errors.email" class="text-red-500">{{ orderForm.errors.email }}</div>
+                        <InputLabel for="message" value="Введите сообщение" />
                         <TextArea name="message" v-model="orderForm.message"/>
-                        <PrimaryButton type="submit" class="mt-2 mx-2" @click.prevent="submitOrder" :disabled="orderForm.processing">создать</PrimaryButton>
-                        <SecondaryButton class="mt-2 mx-2" @click="orderForm.reset()">отменить</SecondaryButton>
+                        <div v-if="orderForm.errors.message" class="text-red-500">{{ orderForm.errors.message }}</div>
+                        <PrimaryButton type="submit" class="mt-2 mr-2" @click.prevent="submitOrder" :disabled="orderForm.processing">создать</PrimaryButton>
+                        <SecondaryButton class="mt-2" @click="orderForm.reset()">отменить</SecondaryButton>
                     </form>
                     <Transition @after-enter="onAfterMessage">
-                        <div v-if="messageSuccess" class="my-4 px-12 absolute bg-green-300 w-auto py-4 text-lg text-green-900 border border-green-700">{{ messageSuccess }}</div>
+                        <div v-if="messageSuccess" class="my-4 px-12 absolute bg-green-300 w-auto py-2 text-lg text-green-900 border border-green-700">{{ messageSuccess }}</div>
                     </Transition>
                     <Transition @after-enter="onAfterMessage">
-                        <div v-if="messageError" class="my-4 px-12 absolute bg-pink-300 w-auto py-4 text-lg text-red-900 border border-red-700" @after-enter="onAfterMessage">{{ messageError }}</div>
+                        <div v-if="messageError" class="my-4 px-12 absolute bg-pink-300 w-auto py-2 text-lg text-red-900 border border-red-700" @after-enter="onAfterMessage">{{ messageError }}</div>
                     </Transition>
                 </div>
             </div>

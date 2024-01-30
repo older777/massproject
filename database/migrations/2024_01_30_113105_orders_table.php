@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email');
             $table->enum('status', ['Active', 'Resolved'])->default('Active');
             $table->text('message');
-            $table->text('comment');
+            $table->text('comment')->nullable();
             $table->timestamps();
         });
     }
