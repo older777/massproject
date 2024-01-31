@@ -18,13 +18,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/requests', 'App\Http\Controllers\OrderController@submitOrder')->name('submit.order');
-
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/requests/{id}', 'App\Http\Controllers\OrderController@orderProcess')->name('order.update');
-    Route::get('/requests', function () {
-        inertia('Dashboard', [
-            'orders' => Order::all(),
-        ]);
-    })->name('get.orders');
 });

@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\Order;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,11 +27,19 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::get('/dashboard', function () {
+Route::get('/dashboard', function (Request $request) {
     return Inertia::render('Dashboard', [
-        'orders' => Order::all(),
+        'orders' => Inertia::lazy( function () use ($request) {
+            if ($request->input('sort')) {
+                return Order::orderBy($request->sort)->get();
+            } else {
+                return Order::all();
+            }
+        }),
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::post('/requests', 'App\Http\Controllers\OrderController@submitOrder')->name('submit.order');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

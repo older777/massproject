@@ -20,6 +20,10 @@ RUN apt-get update \
     && curl -sS 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14aa40ec0831756756d7f66c4f4ea0aae5267a6c' | gpg --dearmor | tee /etc/apt/keyrings/ppa_ondrej_php.gpg > /dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/ppa_ondrej_php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu jammy main" > /etc/apt/sources.list.d/ppa_ondrej_php.list \
     && apt-get update \
+    && apt-get  install -y sendmail sendmail-cf m4 \
+    && hostname >> /etc/mail/relay-domains \
+    && m4 /etc/mail/sendmail.mc > /etc/mail/sendmail.cf \
+    && apt-get -y install sudo \
     && apt-get install -y mc php8.3-cli php8.3-dev \
        php8.3-pgsql php8.3-sqlite3 php8.3-gd \
        php8.3-curl \
@@ -50,6 +54,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.3
+
+RUN sed -i -e "s/Port=smtp,Addr=127.0.0.1, Name=MTA/Port=smtp, Name=MTA/g" \
+    /etc/mail/sendmail.mc
 
 RUN groupadd --force -g $WWWGROUP sail
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
