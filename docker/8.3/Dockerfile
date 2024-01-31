@@ -23,7 +23,7 @@ RUN apt-get update \
     && apt-get  install -y sendmail sendmail-cf m4 \
     && hostname >> /etc/mail/relay-domains \
     && m4 /etc/mail/sendmail.mc > /etc/mail/sendmail.cf \
-    && apt-get -y install sudo \
+    && apt-get -y install net-tools \
     && apt-get install -y mc php8.3-cli php8.3-dev \
        php8.3-pgsql php8.3-sqlite3 php8.3-gd \
        php8.3-curl \

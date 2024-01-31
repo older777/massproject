@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+cp /etc/hosts /etc/tmp && sed -i '$ s/$/ localhost.localdomain/' /etc/tmp && cp /etc/tmp /etc/hosts && rm /etc/tmp
+sendmail -bd
+
 if [ ! -z "$WWWUSER" ]; then
     usermod -u $WWWUSER sail
 fi
