@@ -31,15 +31,17 @@ const orderForm = useForm({
     email: '',
     message: '',
 });
-const submitOrder = () => {
+const submitOrder = async () => {
     orderForm.clearErrors();
-    const res = axios.post(route('submit.order'), orderForm)
-        .then((res) => { showSuccess(res.data.messageSuccess); })
+    orderForm.processing = true;
+    await axios.post(route('submit.order'), orderForm)
+        .then((resp) => { showSuccess(resp.data.messageSuccess); })
         .catch(function (error) {
             if (error.response) {
                 showError(error.response.data);
             };
          });
+    orderForm.processing = false;
 };
 
 const showSuccess = (message) => {
@@ -128,16 +130,16 @@ onBeforeMount(() => {
                         <TextInput type="email" name="email" v-model="orderForm.email" required />
                         <div v-if="orderForm.errors.email" class="text-red-500">{{ orderForm.errors.email }}</div>
                         <InputLabel for="message" value="Введите сообщение" />
-                        <TextArea name="message" v-model="orderForm.message"/>
+                        <TextArea name="message" v-model="orderForm.message" />
                         <div v-if="orderForm.errors.message" class="text-red-500">{{ orderForm.errors.message }}</div>
-                        <PrimaryButton type="submit" class="mt-2 mr-2" @click.prevent="submitOrder" :disabled="orderForm.processing">создать</PrimaryButton>
-                        <SecondaryButton class="mt-2" @click="orderForm.reset()">отменить</SecondaryButton>
+                        <PrimaryButton type="submit" class="mt-2 mr-2 disabled:pointer-events-none disabled:bg-gray-300" @click.prevent="submitOrder" :disabled="orderForm.processing">создать</PrimaryButton>
+                        <SecondaryButton class="mt-2" @click="() => { orderForm.reset(); orderForm.clearErrors(); }">отменить</SecondaryButton>
                     </form>
-                    <Transition @after-enter="onAfterMessage">
-                        <div v-if="messageSuccess" class="my-4 px-12 absolute bg-green-300 w-auto py-2 text-lg text-green-900 border border-green-700">{{ messageSuccess }}</div>
+                    <Transition @after-enter="onAfterMessage" name="message">
+                        <div v-if="messageSuccess" class="my-4 px-12 absolute bg-green-300 w-auto py-2 text-green-900 border border-green-700">{{ messageSuccess }}</div>
                     </Transition>
-                    <Transition @after-enter="onAfterMessage">
-                        <div v-if="messageError" class="my-4 px-12 absolute bg-pink-300 w-auto py-2 text-lg text-red-900 border border-red-700" @after-enter="onAfterMessage">{{ messageError }}</div>
+                    <Transition @after-enter="onAfterMessage" name="message">
+                        <div v-if="messageError" class="my-4 px-12 absolute bg-pink-300 w-auto py-2 text-red-900 border border-red-700" @after-enter="onAfterMessage">{{ messageError }}</div>
                     </Transition>
                 </div>
             </div>
@@ -151,7 +153,7 @@ onBeforeMount(() => {
     </div>
 </template>
 
-<style>
+<style scoped>
 .bg-dots-darker {
     background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(0,0,0,0.07)'/%3E%3C/svg%3E");
 }
@@ -160,14 +162,14 @@ onBeforeMount(() => {
         background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(255,255,255,0.07)'/%3E%3C/svg%3E");
     }
 }
-.v-enter-active,
-.v-leave-active {
+.message-enter-active,
+.message-leave-active {
     transition: all .3s ease-out;
     transform: translateX(0);
 }
 
-.v-enter-from,
-.v-leave-to {
+.message-enter-from,
+.message-leave-to {
     transform: translateX(30vw);
     opacity: 0;
 }
