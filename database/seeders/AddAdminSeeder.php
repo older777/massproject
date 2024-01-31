@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -10,12 +9,15 @@ use Illuminate\Support\Facades\Hash;
 
 class AddAdminSeeder extends Seeder
 {
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        User::factory()->create([
+        User::firstOrCreate([
+            'name' => 'admin'
+        ], [
             'name' => 'admin',
             'email' => 'test@example.com',
             'password' => Hash::make('123'),

@@ -7,12 +7,14 @@
     composer install
     php artisan vendor:publish (ресурсы всех вендров: All providers and tags)
     php artisan sail:publish
-    php artisan migrate
-    php artisan db:seed AddAdminSeeder # добавить пользователя admin (*test@example.com*, *123*)
     ./sail build --no-cache
     ./sail up
-    *(в новом окне терминала)* ./sail npm install
-    ./sail npm run buid (или ./sail npm run dev)
+    
+    *(в новом окне терминала)*
+    ./sail artisan migrate
+    ./sail artisan db:seed AddAdminSeeder # добавить пользователя admin (*test@example.com*, *123*)
+    ./sail npm install
+    ./sail npm run dev
 
 Устновить актуальное значение MAIL_FROM_ADDRESS.
 
