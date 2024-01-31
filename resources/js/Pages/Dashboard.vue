@@ -62,7 +62,7 @@ const enableSubmit = computed( () => {
     }
 });
 const onAfterMessage = () => {
-    setTimeout(() => {messageSuccess.value = ''; messageError.value = ''; loadOrders();}, '3000');
+    setTimeout(() => {messageSuccess.value = ''; messageError.value = '';}, '3000');
 };
 const showSuccess = (message) => {
     messageSuccess.value = message;
@@ -133,7 +133,7 @@ onBeforeMount(() => {
                     :disabled="enableSubmit">
                     Отправить
                 </PrimaryButton>
-                <SecondaryButton class="mt-2" @click="show = false">Закрыть</SecondaryButton>
+                <SecondaryButton class="mt-2" @click="() => { loadOrders(); show = false;}">Закрыть</SecondaryButton>
                 <div class="h-16 w-3/4">
                     <Transition @after-enter="onAfterMessage" name="message">
                         <div v-if="messageSuccess" class="my-4 px-12 absolute bg-green-300 w-auto py-2 text-green-900 border border-green-700">{{ messageSuccess }}</div>
