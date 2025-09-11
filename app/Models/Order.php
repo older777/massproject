@@ -11,6 +11,7 @@ class Order extends Model
 
     /**
      * @desc Fillable fields
+     *
      * @var array
      */
     protected $fillable = [
@@ -20,8 +21,10 @@ class Order extends Model
         'message',
         'comment',
     ];
+
     /**
      * @desc приведение дат к виду Y.m.d H:i:s
+     *
      * @var array
      */
     protected $casts = [
