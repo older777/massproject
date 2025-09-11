@@ -20,3 +20,6 @@ yarn-error.log
 /.editorconfig
 /.project
 /package-lock.json
+/.buildpath
+/.settings/
+/composer.lock
