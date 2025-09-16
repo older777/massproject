@@ -1,7 +1,7 @@
 <?php
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\Order;
 
 /*
  * |--------------------------------------------------------------------------
@@ -18,6 +18,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'admin.inertia'])->group(function () {
     Route::put('/requests/{id}', 'App\Http\Controllers\OrderController@orderProcess')->name('order.update');
 });
