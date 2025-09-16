@@ -13,11 +13,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(AddAdminSeeder::class);
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        $this->call(ProductSeeder::class);
+        $this->call(ElasticIndexSeeder::class);
     }
 }
