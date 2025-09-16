@@ -1,0 +1,12 @@
+- pipeline.id: phones
+  pipeline.workers: 1
+  pipeline.batch.size: 1
+  path.config: "./config/pipelines/phones.conf"
+- pipeline.id: tablets
+  pipeline.workers: 1
+  pipeline.batch.size: 1
+  path.config: "./config/pipelines/tablets.conf"
+- pipeline.id: parts
+  pipeline.workers: 1
+  pipeline.batch.size: 1
+  path.config: "./config/pipelines/parts.conf"

@@ -4,39 +4,39 @@ services:
             context: ./docker/8.3
             dockerfile: Dockerfile
             args:
-                WWWGROUP: '${WWWGROUP}'
+                WWWGROUP: ${WWWGROUP}
         image: sail-8.3/app
         extra_hosts:
-            - 'host.docker.internal:host-gateway'
+            - host.docker.internal:host-gateway
         ports:
-            - '${APP_PORT:-80}:80'
-            - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+            - ${APP_PORT:-80}:80
+            - ${VITE_PORT:-5173}:${VITE_PORT:-5173}
         environment:
-            WWWUSER: '${WWWUSER}'
+            WWWUSER: ${WWWUSER}
             LARAVEL_SAIL: 1
-            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
-            XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
-            IGNITION_LOCAL_SITES_PATH: '${PWD}'
+            XDEBUG_MODE: ${SAIL_XDEBUG_MODE:-off}
+            XDEBUG_CONFIG: ${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}
+            IGNITION_LOCAL_SITES_PATH: ${PWD}
         volumes:
-            - '.:/var/www/html'
+            - .:/var/www/html
         networks:
             - sail
         depends_on:
             - mysql
     mysql:
-        image: 'mysql/mysql-server:8.0'
+        image: mysql/mysql-server:8.0
         ports:
-            - '${FORWARD_DB_PORT:-3306}:3306'
+            - ${FORWARD_DB_PORT:-3306}:3306
         environment:
-            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_ROOT_HOST: '%'
-            MYSQL_DATABASE: '${DB_DATABASE}'
-            MYSQL_USER: '${DB_USERNAME}'
-            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
             MYSQL_ALLOW_EMPTY_PASSWORD: 1
         volumes:
-            - 'sail-mysql:/var/lib/mysql'
-            - './docker/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+            - sail-mysql:/var/lib/mysql
+            - ./docker/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh
         networks:
             - sail
         healthcheck:
@@ -44,12 +44,97 @@ services:
                 - CMD
                 - mysqladmin
                 - ping
-                - '-p${DB_PASSWORD}'
+                - -p${DB_PASSWORD}
             retries: 3
             timeout: 5s
+    elasticsearch:
+        image: elasticsearch:8.19.3
+        environment:
+            - node.name=master-node
+            - cluster.name=mh-test
+            - discovery.type=single-node
+            - bootstrap.memory_lock=true
+            - xpack.security.enabled=false
+            - KIBANA_ELASTICSEARCH_USERNAME=kibana_system
+            - KIBANA_ELASTICSEARCH_PASSWORD=kibana
+            - path.repo=/usr/share/elasticsearch/backups
+            - ES_JAVA_OPTS=-Xms512m -Xmx512m
+            - TZ=Europe/Moscow
+        ulimits:
+          memlock:
+            soft: -1
+            hard: -1
+        volumes:
+            - test-elastic:/usr/share/elasticsearch/data
+            - ./docker/elastic/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+        ports:
+            - 9200:9200
+        networks:
+            - sail
+        healthcheck:
+            test: curl -s http://elasticsearch:9200 >/dev/null || exit 1
+            interval: 30s
+            timeout: 10s
+            retries: 50
+    kibana:
+        image: kibana:8.19.3
+        environment:
+            - elasticsearch.url=http://elasticsearch:9200
+            - csp.strict=false
+            - TZ=Europe/Moscow
+            - XPACK_MONITORING_ENABLED=true
+            - XPACK_MONITORING_COLLECTION_ENABLED=true
+            - XPACK_SECURITY_ENABLED=false
+            - ELASTICSEARCH_USERNAME=kibana_system
+            - ELASTICSEARCH_PASSWORD=kibana
+            - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=68d48e67ec0022f637e7679bb1534f98
+            - XPACK_REPORTING_ENCRYPTIONKEY=0eee01a294b28ca44659a198299a4aff
+            - XPACK_SECURITY_ENCRYPTIONKEY=484d1c2b4d47476dd07554802323541f
+            - XPACK_FLEET_AGENTS_TLSCHECKDISABLED=true
+        #command: bash -c "bin/kibana-encryption-keys generate && /usr/local/bin/kibana-docker"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        ports:
+            - 5601:5601
+        networks:
+            - sail
+        depends_on:
+            elasticsearch:
+                condition: service_healthy
+    logstash:
+        hostname: logstash
+        image: logstash:9.1.3
+        environment:
+            - xpack.monitoring.enabled=false
+            - xpack.monitoring.elasticsearch.username=elastic
+            - ELASTIC_HOSTS=http://elasticsearch:9200
+            - XPACK_MONITORING_ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+            - max_retries=-1
+            - TZ=Europe/Moscow
+            - MYSQL_DATABASE=${DB_DATABASE}
+            - MYSQL_USER=${DB_USERNAME}
+            - MYSQL_PASSWORD=${DB_PASSWORD}
+        volumes:
+            - ./docker/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+            - ./docker/logstash/pipelines:/usr/share/logstash/config/pipelines
+            - ./docker/logstash/mysql-connector-java-8.0.11.jar:/usr/share/logstash/logstash-core/lib/jars/mysql-connector-java.jar
+        extra_hosts:
+            - host.docker.internal:host-gateway
+        ports:
+            - 5044:5044
+            - 9600:9600
+        networks:
+            - sail
+        depends_on:
+            elasticsearch:
+                condition: service_healthy
 networks:
     sail:
         driver: bridge
 volumes:
     sail-mysql:
+        driver: local
+    test-elastic:
         driver: local
