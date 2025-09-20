@@ -1,3 +1,5 @@
 *
+!product_init
+!product_init/*
 !public/
 !.gitignore

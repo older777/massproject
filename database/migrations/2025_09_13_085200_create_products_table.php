@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['phone', 'tablet', 'parts']);
+            $table->enum('type', ['phones', 'tablets', 'parts']);
             $table->float('price', 12, 2);
             $table->boolean('published')->default(true);
             $table->timestamps();

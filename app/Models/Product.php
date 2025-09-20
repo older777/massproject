@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -41,5 +42,29 @@ class Product extends Model implements HasMedia
             ->addMediaConversion('preview')
             ->fit(Fit::Contain, 250, 250)
             ->nonQueued();
+    }
+
+    /**
+     * Телефоны
+     */
+    public function phone(): HasOne
+    {
+        return $this->hasOne(Phone::class);
+    }
+
+    /**
+     * Планшеты
+     */
+    public function tablet(): HasOne
+    {
+        return $this->hasOne(Tablet::class);
+    }
+
+    /**
+     * Аксессуары
+     */
+    public function part(): HasOne
+    {
+        return $this->hasOne(Part::class);
     }
 }

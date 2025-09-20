@@ -19,13 +19,16 @@ class ElasticIndexSeeder extends Seeder
             ->get(['index' => 'phones-000001'])
             ->asObject();
 
-        if ($response->status == Response::HTTP_NOT_FOUND) {
+        if (isset($response->status) && $response->status == Response::HTTP_NOT_FOUND) {
             $client->setResponseException(true);
             $params = [
                 'index' => 'phones-000001',
                 'body' => [
                     'mappings' => [
                         'properties' => [
+                            'type' => [
+                                'type' => 'keyword',
+                            ],
                             'id' => [
                                 'type' => 'long',
                             ],
@@ -115,13 +118,16 @@ class ElasticIndexSeeder extends Seeder
             ->get(['index' => 'tablets-000001'])
             ->asObject();
 
-        if ($response->status == Response::HTTP_NOT_FOUND) {
+        if (isset($response->status) && $response->status == Response::HTTP_NOT_FOUND) {
             $client->setResponseException(true);
             $params = [
                 'index' => 'tablets-000001',
                 'body' => [
                     'mappings' => [
                         'properties' => [
+                            'type' => [
+                                'type' => 'keyword',
+                            ],
                             'id' => [
                                 'type' => 'long',
                             ],
@@ -211,13 +217,16 @@ class ElasticIndexSeeder extends Seeder
             ->get(['index' => 'parts-000001'])
             ->asObject();
 
-        if ($response->status == Response::HTTP_NOT_FOUND) {
+        if (isset($response->status) && $response->status == Response::HTTP_NOT_FOUND) {
             $client->setResponseException(true);
             $params = [
                 'index' => 'parts-000001',
                 'body' => [
                     'mappings' => [
                         'properties' => [
+                            'type' => [
+                                'type' => 'keyword',
+                            ],
                             'id' => [
                                 'type' => 'long',
                             ],
