@@ -108,11 +108,11 @@ onBeforeMount(() => {
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head title="Личный кабинет" />
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Данные тикетов</h2>
         </template>
         
         <Modal :show="show" :maxWidth="'xl'">
