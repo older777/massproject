@@ -2,4 +2,5 @@
 !product_init
 !product_init/*
 !public/
+!*.png
 !.gitignore
