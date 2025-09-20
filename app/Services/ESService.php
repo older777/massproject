@@ -251,8 +251,20 @@ final class ESService
                 ],
             ];
         }
-        if ($this->request->get('filters')) {
-            $filters = [];
+        if ($this->request->has('brands') && count($this->request->get('brands'))) {
+            $brands = implode(' ', $this->request->get('brands'));
+            $params['body']['query']['bool']['must'][]['match'] = [
+                'name' => $brands,
+            ];
+        }
+        if ($this->request->has('price')) {
+            $price = $this->request->get('price');
+            $params['body']['query']['bool']['must'][]['range'] = [
+                'price' => [
+                    'gte' => $price[0],
+                    'lte' => $price[1],
+                ],
+            ];
         }
         $this->products = collect([]);
         $result = $this->client->search($params);

@@ -19,7 +19,7 @@ defineProps({
                 <img :src="product.preview" class="lg:w-[250px]">
             </div>
             <div class="flex justify-between mt-2 group-hover:text-indigo/90">
-                <div class="text-gray-500 group-hover:text-indigo/90"><span class="text-lg font-semibold text-gray-900
+                <div class="text-gray-500 group-hover:text-indigo/90 lg:w-[160px]"><span class="text-lg font-semibold text-gray-900
                  group-hover:text-indigo/90">{{ product.name }}</span>{{ product.display_size ? ', '+product.display_size+'"':'' }}</div>
                 <div>{{ product.price }} ₽</div>
             </div>
