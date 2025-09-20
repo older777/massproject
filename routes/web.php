@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Models\Order;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Models\Order;
-use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,18 +18,32 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/', function () {
+Route::get('/', 'App\Http\Controllers\HomeController@home')->name('home');
+
+Route::get('/ticket', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-})->name('home');
+})->name('ticket');
+
+Route::get('/contacts', function (Request $request) {
+    return Inertia::render('Contacts', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
+})->name('contacts');
+
+Route::get('/search', 'App\Http\Controllers\HomeController@search')->name('search');
+Route::get('/product/{product}', 'App\Http\Controllers\HomeController@product')->name('product');
 
 Route::get('/dashboard', function (Request $request) {
     return Inertia::render('Dashboard', [
-        'orders' => Inertia::lazy( function () use ($request) {
+        'orders' => Inertia::lazy(function () use ($request) {
             if ($request->input('sort')) {
                 return Order::orderBy($request->sort)->get();
             } else {
